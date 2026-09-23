@@ -95,7 +95,7 @@ python Geo_data_cleaning_skill/scripts/data_profiler.py 数据.xlsx
 | 读表探查 | `GeoDataProfiler` | 读取全部 Sheet，探查时每表只取前 1000 行以省内存 |
 | 识别主表 | `detect_main_sheet()` | 列名含 `samp_id` 或 `sample` 的表为主表，否则取第一个 Sheet |
 | 字段识别 | `profile_main()` | 自动识别年龄列（含 `age`）与地理列（含 `lat`/`lon`/`long`），统计缺失值与重复行 |
-| 年龄标准化 | `clean_age()` | `Ga` → ×1000 转 Ma；`Ma` 保留；纯数字直接转 float；无法解析记 `NaN`，结果写入新列 `cleaned_age_Ma` |
+| 年龄标准化 | `clean_age()` | `Ga` → ×1000 转 Ma；`Ma` 保留；纯数字直接转 float；无法解析记 `NaN`，结果写入新列 `cleaned_age_Ma`。`age_choice` 填 `平均值` 时，对多个年龄列逐行取平均 |
 | 关联表合并 | `merge_sheets()` | 以 `samp_id` 为键左连接；该表无此列时，退回使用第一个含 `id` 的列 |
 | 输出 | `save_output()` | 默认输出 `原文件名_cleaned.xlsx`，工作表名 `Cleaned_Main` |
 
@@ -125,7 +125,7 @@ python Geo_data_cleaning_skill/scripts/data_profiler.py 数据.xlsx
 
 ### 5. 年龄列没有标准化
 
-检查列名是否含 `age`（大小写不敏感）；也可以在 `requirements` 里用 `age_choice` 显式指定列名。
+检查列名是否含 `age`（大小写不敏感）；也可以在 `requirements` 里用 `age_choice` 显式指定列名。多个年龄列都想用时，填 `age_choice="平均值"`，程序会逐行取平均。
 
 ### 6. 关联表没并进来
 
@@ -140,7 +140,7 @@ python Geo_data_cleaning_skill/scripts/data_profiler.py 数据.xlsx
 1. **仅支持 Excel**：输入为 `.xlsx` / `.xls`，不支持 CSV、Shapefile 等格式。
 2. **探查是抽样**：探查阶段每表只读前 1000 行，缺失值/重复行统计基于该样本；清洗阶段才加载全量数据。
 3. **合并键固定**：除 `samp_id` 外只做一次「含 id 列」的回退匹配，多键、多对多关系不支持。
-4. **年龄列取平均的分支目前不可用**：`clean_age()` 中 `age_choice == '平均值'` 的分支调用了一个在其上游分支内定义的函数，会抛 `NameError`。请直接指定具体年龄列，或自行修复该分支。
+4. **平均值是按行算的**：`age_choice="平均值"` 逐行对多个年龄列取平均，并自动跳过缺失值或无法解析的值；若某行所有年龄列都无效，结果为 `NaN`（不是整列平均后再填充）。
 5. **地理列只做识别**：目前只统计经纬度列，不做坐标校验、去重或转换。
 6. **数据安全**：清洗在本地进行，但请自行确认输入数据的存放与分享是否合规。
 
