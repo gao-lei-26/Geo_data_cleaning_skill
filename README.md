@@ -146,4 +146,6 @@ python Geo_data_cleaning_skill/scripts/data_profiler.py 数据.xlsx
 
 ## 许可
 
-未附许可证文件。如需他人合法复用，建议补充 MIT / Apache-2.0 等许可证。
+本项目采用 **MIT 许可证**，可自由使用、修改、分发（包括商用），只需保留版权声明。完整条款见 [LICENSE](LICENSE)。
+
+Copyright (c) 2026 gao-lei-26
